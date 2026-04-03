@@ -339,6 +339,7 @@ pub async fn fetch_mirrors(
 }
 
 /// Posts a JSON to a URL
+#[allow(dead_code)]
 #[tracing::instrument(skip(json_body, semaphore))]
 pub async fn post_json(
     url: &str,
