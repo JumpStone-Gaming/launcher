@@ -11,7 +11,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Wir starten mit Windows. Später kannst du 'macos-latest', 'ubuntu-latest' hinzufügen.
         platform: [windows-latest]
         include:
           - platform: windows-latest
@@ -24,59 +23,46 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: false # Verhindert Fehler bei Modrinth-internen Submodulen
+          submodules: false # WICHTIG: Verhindert Abbrüche durch fremde Submodule
 
-      - name: Cleanup stale processes
-        # Beendet vctip.exe, falls es aus einem vorherigen Lauf noch Dateien sperrt
+      - name: Cleanup Windows Runner
+        # Dieser Schritt beendet blockierende Prozesse, BEVOR Tools installiert werden
         run: |
           Get-Process vctip -ErrorAction SilentlyContinue | Stop-Process -Force
+          Get-Process msbuild -ErrorAction SilentlyContinue | Stop-Process -Force
         shell: pwsh
-
-      - name: Setup Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9 # Stellt sicher, dass die pnpm Version zur Lockfile passt
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24 # Upgrade auf Version 24, um Deprecation-Fehler zu vermeiden
-          cache: pnpm
+          node-version: 24 # Upgrade auf die neueste stabile Version
+          # Wir lassen den Cache erst mal weg, um Fehler durch alte Caches zu vermeiden
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - name: Set application version
         shell: bash
         run: |
-          # Nutzt den Git-Tag als Version oder einen Fallback
           APP_VERSION="${GITHUB_REF_NAME#v}"
           [ "$APP_VERSION" == "main" ] && APP_VERSION="0.1.0-dev"
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
-
-          # Versionen in den Configs patchen
+          # Patcht die Version in die package.json
           sed -i "s/\"version\": \".*\"/\"version\": \"$APP_VERSION\"/" apps/app-frontend/package.json
 
-      - name: Prepare app-lib env
-        shell: bash
-        run: |
-          # Erstellt die .env Datei, falls sie fehlt, um Build-Abbrüche zu verhindern
-          mkdir -p packages/app-lib
-          if [ -f packages/app-lib/.env.prod ]; then
-            cp packages/app-lib/.env.prod packages/app-lib/.env
-          else
-            touch packages/app-lib/.env
-          fi
-
       - name: Install dependencies
-        # Falls die Lockfile immer noch zickt, ändere dies zu: pnpm install --no-frozen-lockfile
-        run: pnpm install --frozen-lockfile
+        # Wir nutzen --no-frozen-lockfile, damit pnpm kleine Abweichungen selbst heilt
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build Windows app
         timeout-minutes: 120
         run: pnpm app:build
         env:
-          # Sicherstellen, dass keine Modrinth-spezifischen Signier-Tools erzwungen werden
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
