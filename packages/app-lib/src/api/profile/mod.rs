@@ -14,14 +14,11 @@ use crate::state::{
 };
 
 use crate::event::{ProfilePayloadType, emit::emit_profile};
-use crate::util::fetch;
 use crate::util::io::{self, IOError};
 pub use crate::{State, state::Profile};
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
 use path_util::SafeRelativeUtf8UnixPathBuf;
-use serde_json::json;
-use tracing::warn;
 
 use std::collections::{HashMap, HashSet};
 

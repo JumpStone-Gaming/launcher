@@ -49,6 +49,10 @@ jobs:
           # Versionen in den Configs patchen (ohne das Tool 'dasel' zu brauchen)
           sed -i "s/\"version\": \".*\"/\"version\": \"$APP_VERSION\"/" apps/app-frontend/package.json
 
+      - name: Prepare app-lib env
+        shell: bash
+        run: cp packages/app-lib/.env.prod packages/app-lib/.env
+
       - name: Install dependencies
         run: pnpm install
 
