@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { CheckIcon, DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
+	ButtonStyled,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -12,19 +14,21 @@ import {
 	ProjectCardList,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, inject, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
+import { injectContentInstall } from '@/providers/content-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs.js'
 
 const route = useRoute()
+const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setRootContext({ name: 'JS Gaming', link: route.path })
 
 const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-const showCreationModal = inject<(() => void) | undefined>('showCreationModal')
+const { install: installContent } = injectContentInstall()
 
 const messages = defineMessages({
 	pageTitle: {
@@ -38,10 +42,6 @@ const messages = defineMessages({
 	openOrganization: {
 		id: 'app.jsgaming.open-organization',
 		defaultMessage: 'JumpStone-Gaming auf Modrinth öffnen',
-	},
-	install: {
-		id: 'app.jsgaming.install',
-		defaultMessage: 'Installieren',
 	},
 	all: {
 		id: 'app.jsgaming.tabs.all',
@@ -71,6 +71,18 @@ const messages = defineMessages({
 		id: 'app.jsgaming.retry',
 		defaultMessage: 'Erneut versuchen',
 	},
+	install: {
+		id: 'app.jsgaming.install',
+		defaultMessage: 'Installieren',
+	},
+	installing: {
+		id: 'app.jsgaming.installing',
+		defaultMessage: 'Installing...',
+	},
+	installed: {
+		id: 'app.jsgaming.installed',
+		defaultMessage: 'Installed',
+	},
 })
 
 const organizationUrl = 'https://modrinth.com/organization/jumpstone-gaming'
@@ -79,6 +91,8 @@ const organizationCandidates = ['jumpstone-gaming', 'qrldrfiD']
 const projects = ref<Labrinth.Projects.v3.Project[]>([])
 const isLoading = ref(true)
 const loadError = ref(false)
+const installingProjects = ref<string[]>([])
+const newlyInstalled = ref<string[]>([])
 
 const tabLinks = computed(() => [
 	{ label: formatMessage(messages.all), href: '' },
@@ -116,6 +130,37 @@ const filteredProjects = computed<Labrinth.Projects.v3.Project[]>(() => {
 	}
 	return visibleProjects.value
 })
+
+function isProjectInstalling(projectId: string) {
+	return installingProjects.value.includes(projectId)
+}
+
+function isProjectInstalled(projectId: string) {
+	return newlyInstalled.value.includes(projectId)
+}
+
+async function installProject(project: Labrinth.Projects.v3.Project) {
+	if (isProjectInstalling(project.id) || isProjectInstalled(project.id)) return
+
+	installingProjects.value.push(project.id)
+
+	await installContent(
+		project.id,
+		null,
+		null,
+		'JsGaming',
+		(versionId) => {
+			if (versionId && !newlyInstalled.value.includes(project.id)) {
+				newlyInstalled.value.push(project.id)
+			}
+		},
+		(profile) => {
+			router.push(`/instance/${profile}`)
+		},
+	).catch(handleError)
+
+	installingProjects.value = installingProjects.value.filter((id) => id !== project.id)
+}
 
 async function loadProjects() {
 	isLoading.value = true
@@ -170,9 +215,6 @@ onMounted(() => {
 				>
 					{{ formatMessage(messages.openOrganization) }}
 				</Button>
-				<Button color="brand" large :disabled="!showCreationModal" :action="showCreationModal">
-					{{ formatMessage(messages.install) }}
-				</Button>
 			</div>
 		</section>
 
@@ -211,7 +253,30 @@ onMounted(() => {
 				:date-updated="project.updated"
 				:tags="project.categories"
 				layout="list"
-			/>
+			>
+				<template #actions>
+					<ButtonStyled color="brand" type="outlined">
+						<button
+							:disabled="isProjectInstalled(project.id) || isProjectInstalling(project.id)"
+							class="shrink-0 no-wrap"
+							@click.stop="installProject(project)"
+						>
+							<SpinnerIcon v-if="isProjectInstalling(project.id)" class="animate-spin" />
+							<CheckIcon v-else-if="isProjectInstalled(project.id)" />
+							<DownloadIcon v-else />
+							{{
+								formatMessage(
+									isProjectInstalling(project.id)
+										? messages.installing
+										: isProjectInstalled(project.id)
+											? messages.installed
+											: messages.install,
+								)
+							}}
+						</button>
+					</ButtonStyled>
+				</template>
+			</ProjectCard>
 		</ProjectCardList>
 	</div>
 </template>

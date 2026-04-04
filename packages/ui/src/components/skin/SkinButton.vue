@@ -113,9 +113,9 @@ function onImageLoad(type: 'forward' | 'backward') {
 	background:
 		linear-gradient(
 			157.61deg,
-			var(--color-brand) -76.68%,
-			rgba(27, 217, 106, 0.534) -38.61%,
-			rgba(12, 89, 44, 0.6) 100.4%
+			rgba(255, 255, 255, 0.45) -76.68%,
+			rgba(239, 239, 239, 0.4) -38.61%,
+			rgba(209, 213, 219, 0.38) 100.4%
 		),
 		var(--color-bg);
 }

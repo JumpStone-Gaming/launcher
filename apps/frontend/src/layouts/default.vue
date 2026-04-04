@@ -969,7 +969,7 @@ useSeoMeta({
 				'Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
 		}),
 	publisher: 'Modrinth',
-	themeColor: '#1bd96a',
+	themeColor: '#6D1BD9',
 	colorScheme: 'dark light',
 
 	// OpenGraph

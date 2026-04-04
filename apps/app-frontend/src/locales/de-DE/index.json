@@ -62,6 +62,12 @@
 	"app.export-modal.version-number-placeholder": {
 		"message": "1.0.0"
 	},
+	"app.home.welcome-back": {
+		"message": "Willkommen zurück!"
+	},
+	"app.home.welcome-to-app": {
+		"message": "Willkommen bei der JSGaming App!"
+	},
 	"app.instance.confirm-delete.admonition-body": {
 		"message": "Alle Daten für deine Instanz werden permanent gelöscht, einschließlich deiner Welten, Konfigurationen und allen installierten Inhalten."
 	},

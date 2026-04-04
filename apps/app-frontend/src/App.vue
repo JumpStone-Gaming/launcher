@@ -50,7 +50,8 @@ import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
-import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
+import AppLogoBlack from '@/assets/app_black.png'
+import AppLogoWhite from '@/assets/app_white.png'
 import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
@@ -224,10 +225,10 @@ const messages = defineMessages({
 		defaultMessage:
 			'Minecraft authentication servers may be down right now. Check your internet connection and try again later.',
 	},
-		jsgamingNav: {
-			id: 'app.nav.js-gaming',
-			defaultMessage: 'JS Gaming',
-		},
+	jsgamingNav: {
+		id: 'app.nav.js-gaming',
+		defaultMessage: 'JS Gaming',
+	},
 })
 
 async function setupApp() {
@@ -408,6 +409,28 @@ const installToPlayModal = ref()
 const updateToPlayModal = ref()
 
 const sidebarToggled = ref(true)
+const systemPrefersDark = ref(false)
+
+const isDarkLikeTheme = computed(() => {
+	if (themeStore.selectedTheme === 'dark' || themeStore.selectedTheme === 'oled') {
+		return true
+	}
+
+	if (themeStore.selectedTheme === 'light') {
+		return false
+	}
+
+	return systemPrefersDark.value
+})
+
+const appTopbarLogo = computed(() => (isDarkLikeTheme.value ? AppLogoWhite : AppLogoBlack))
+
+let systemThemeMediaQuery
+const updateSystemThemePreference = () => {
+	if (systemThemeMediaQuery) {
+		systemPrefersDark.value = systemThemeMediaQuery.matches
+	}
+}
 
 themeStore.$subscribe(() => {
 	sidebarToggled.value = !themeStore.toggleSidebar
@@ -418,6 +441,10 @@ const forceSidebar = computed(
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 onMounted(() => {
+	systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+	updateSystemThemePreference()
+	systemThemeMediaQuery.addEventListener('change', updateSystemThemePreference)
+
 	invoke('show_window')
 
 	error.setErrorModal(errorModal.value)
@@ -430,6 +457,10 @@ onMounted(() => {
 	setServerAddServerToInstanceModal(addServerToInstanceModal.value)
 	setServerInstallToPlayModal(installToPlayModal.value)
 	setServerUpdateToPlayModal(updateToPlayModal.value)
+})
+
+onUnmounted(() => {
+	systemThemeMediaQuery?.removeEventListener('change', updateSystemThemePreference)
 })
 
 const accounts = ref(null)
@@ -936,7 +967,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
 			<div data-tauri-drag-region class="flex min-w-0 flex-1 overflow-hidden p-3">
-				<ModrinthAppLogo class="h-full w-auto shrink-0 text-contrast pointer-events-none" />
+				<div class="app-topbar-logo">
+					<img :src="appTopbarLogo" alt="" aria-hidden="true" class="app-logo" />
+				</div>
 				<div data-tauri-drag-region class="flex shrink-0 items-center gap-1 ml-3">
 					<button
 						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
@@ -1218,6 +1251,19 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 .app-grid-statusbar {
 	grid-area: status;
+}
+
+.app-topbar-logo {
+	height: 100%;
+	width: auto;
+	flex-shrink: 0;
+	pointer-events: none;
+}
+
+.app-logo {
+	height: 100%;
+	width: auto;
+	display: block;
 }
 
 [data-tauri-drag-region-exclude] {

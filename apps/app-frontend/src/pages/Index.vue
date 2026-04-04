@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { injectNotificationManager } from '@modrinth/ui'
+import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import type { SearchResult } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, onUnmounted, ref } from 'vue'
@@ -14,8 +14,20 @@ import type { GameInstance } from '@/helpers/types'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
+
+const messages = defineMessages({
+	welcomeBack: {
+		id: 'app.home.welcome-back',
+		defaultMessage: 'Welcome back!',
+	},
+	welcomeToApp: {
+		id: 'app.home.welcome-to-app',
+		defaultMessage: 'Welcome to JSGaming App!',
+	},
+})
 
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
@@ -102,8 +114,10 @@ onUnmounted(() => {
 
 <template>
 	<div class="p-6 flex flex-col gap-2">
-		<h1 v-if="recentInstances?.length > 0" class="m-0 text-2xl font-extrabold">Welcome back!</h1>
-		<h1 v-else class="m-0 text-2xl font-extrabold">Welcome to Modrinth App!</h1>
+		<h1 v-if="recentInstances?.length > 0" class="m-0 text-2xl font-extrabold">
+			{{ formatMessage(messages.welcomeBack) }}
+		</h1>
+		<h1 v-else class="m-0 text-2xl font-extrabold">{{ formatMessage(messages.welcomeToApp) }}</h1>
 		<RecentWorldsList :recent-instances="recentInstances" />
 		<RowDisplay
 			v-if="hasFeaturedProjects"
