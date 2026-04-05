@@ -45,6 +45,25 @@ const developerModeEnabled = defineMessage({
 	defaultMessage: 'Developer mode enabled.',
 })
 
+const messages = defineMessages({
+	settingsTitle: {
+		id: 'app.settings.title',
+		defaultMessage: 'Settings',
+	},
+	appLabel: {
+		id: 'app.settings.app-label',
+		defaultMessage: 'Modrinth App {version}',
+	},
+	macos: {
+		id: 'app.settings.os.macos',
+		defaultMessage: 'macOS',
+	},
+	downloading: {
+		id: 'app.settings.downloading',
+		defaultMessage: 'Downloading v{version}',
+	},
+})
+
 const tabs = [
 	{
 		name: defineMessage({
@@ -138,19 +157,12 @@ function devModeCount() {
 		}
 	}
 }
-
-const messages = defineMessages({
-	downloading: {
-		id: 'app.settings.downloading',
-		defaultMessage: 'Downloading v{version}',
-	},
-})
 </script>
 <template>
 	<TabbedModal ref="modal" :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
-				<SettingsIcon /> Settings
+				<SettingsIcon /> {{ formatMessage(messages.settingsTitle) }}
 			</span>
 		</template>
 		<template #footer>
@@ -178,9 +190,9 @@ const messages = defineMessages({
 						<ModrinthIcon class="w-6 h-6" />
 					</button>
 					<div>
-						<p class="m-0">Modrinth App {{ version }}</p>
+						<p class="m-0">{{ formatMessage(messages.appLabel, { version }) }}</p>
 						<p class="m-0">
-							<span v-if="osPlatform === 'macos'">macOS</span>
+							<span v-if="osPlatform === 'macos'">{{ formatMessage(messages.macos) }}</span>
 							<span v-else class="capitalize">{{ osPlatform }}</span>
 							{{ osVersion }}
 						</p>

@@ -36,6 +36,7 @@ export type AppSettings = {
 	max_concurrent_writes: number
 
 	theme: ColorTheme
+	accent_color: string
 	locale: string
 	default_page: 'home' | 'library'
 	collapsed_navigation: boolean

@@ -1,7 +1,7 @@
 //! Theseus settings file
 
 use serde::{Deserialize, Serialize};
-use sqlx::{Pool, Sqlite};
+use sqlx::{Pool, Row, Sqlite};
 use std::collections::HashMap;
 
 // Types
@@ -12,6 +12,7 @@ pub struct Settings {
     pub max_concurrent_writes: usize,
 
     pub theme: Theme,
+    pub accent_color: String,
     pub locale: String,
     pub default_page: DefaultPage,
     pub collapsed_navigation: bool,
@@ -66,11 +67,11 @@ impl Settings {
     pub async fn get(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<Self> {
-        let res = sqlx::query!(
+        let res = sqlx::query(
             "
             SELECT
                 max_concurrent_writes, max_concurrent_downloads,
-                theme, locale, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,
+                theme, accent_color, locale, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,
                 discord_rpc, developer_mode, telemetry, personalized_ads,
                 onboarded,
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
@@ -86,58 +87,70 @@ impl Settings {
             .await?;
 
         Ok(Self {
-            max_concurrent_downloads: res.max_concurrent_downloads as usize,
-            max_concurrent_writes: res.max_concurrent_writes as usize,
-            theme: Theme::from_string(&res.theme),
-            locale: res.locale,
-            default_page: DefaultPage::from_string(&res.default_page),
-            collapsed_navigation: res.collapsed_navigation == 1,
-            hide_nametag_skins_page: res.hide_nametag_skins_page == 1,
-            advanced_rendering: res.advanced_rendering == 1,
-            native_decorations: res.native_decorations == 1,
-            toggle_sidebar: res.toggle_sidebar == 1,
-            telemetry: res.telemetry == 1,
-            discord_rpc: res.discord_rpc == 1,
-            developer_mode: res.developer_mode == 1,
-            personalized_ads: res.personalized_ads == 1,
-            onboarded: res.onboarded == 1,
+            max_concurrent_downloads: res
+                .get::<i64, _>("max_concurrent_downloads")
+                as usize,
+            max_concurrent_writes: res.get::<i64, _>("max_concurrent_writes")
+                as usize,
+            theme: Theme::from_string(&res.get::<String, _>("theme")),
+            accent_color: res.get::<String, _>("accent_color"),
+            locale: res.get::<String, _>("locale"),
+            default_page: DefaultPage::from_string(
+                &res.get::<String, _>("default_page"),
+            ),
+            collapsed_navigation: res.get::<i64, _>("collapsed_navigation")
+                == 1,
+            hide_nametag_skins_page: res
+                .get::<i64, _>("hide_nametag_skins_page")
+                == 1,
+            advanced_rendering: res.get::<i64, _>("advanced_rendering") == 1,
+            native_decorations: res.get::<i64, _>("native_decorations") == 1,
+            toggle_sidebar: res.get::<i64, _>("toggle_sidebar") == 1,
+            telemetry: res.get::<i64, _>("telemetry") == 1,
+            discord_rpc: res.get::<i64, _>("discord_rpc") == 1,
+            developer_mode: res.get::<i64, _>("developer_mode") == 1,
+            personalized_ads: res.get::<i64, _>("personalized_ads") == 1,
+            onboarded: res.get::<i64, _>("onboarded") == 1,
             extra_launch_args: res
-                .extra_launch_args
+                .get::<Option<String>, _>("extra_launch_args")
                 .as_ref()
                 .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
             custom_env_vars: res
-                .custom_env_vars
+                .get::<Option<String>, _>("custom_env_vars")
                 .as_ref()
                 .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
             memory: MemorySettings {
-                maximum: res.mc_memory_max as u32,
+                maximum: res.get::<i64, _>("mc_memory_max") as u32,
             },
-            force_fullscreen: res.mc_force_fullscreen == 1,
+            force_fullscreen: res.get::<i64, _>("mc_force_fullscreen") == 1,
             game_resolution: WindowSize(
-                res.mc_game_resolution_x as u16,
-                res.mc_game_resolution_y as u16,
+                res.get::<i64, _>("mc_game_resolution_x") as u16,
+                res.get::<i64, _>("mc_game_resolution_y") as u16,
             ),
-            hide_on_process_start: res.hide_on_process_start == 1,
+            hide_on_process_start: res.get::<i64, _>("hide_on_process_start")
+                == 1,
             hooks: Hooks {
-                pre_launch: res.hook_pre_launch,
-                wrapper: res.hook_wrapper,
-                post_exit: res.hook_post_exit,
+                pre_launch: res.get::<Option<String>, _>("hook_pre_launch"),
+                wrapper: res.get::<Option<String>, _>("hook_wrapper"),
+                post_exit: res.get::<Option<String>, _>("hook_post_exit"),
             },
-            custom_dir: res.custom_dir,
-            prev_custom_dir: res.prev_custom_dir,
-            migrated: res.migrated == 1,
+            custom_dir: res.get::<Option<String>, _>("custom_dir"),
+            prev_custom_dir: res.get::<Option<String>, _>("prev_custom_dir"),
+            migrated: res.get::<i64, _>("migrated") == 1,
             feature_flags: res
-                .feature_flags
+                .get::<Option<String>, _>("feature_flags")
                 .as_ref()
                 .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
-            skipped_update: res.skipped_update,
+            skipped_update: res.get::<Option<String>, _>("skipped_update"),
             pending_update_toast_for_version: res
-                .pending_update_toast_for_version,
-            auto_download_updates: res.auto_download_updates.map(|x| x == 1),
-            version: res.version as usize,
+                .get::<Option<String>, _>("pending_update_toast_for_version"),
+            auto_download_updates: res
+                .get::<Option<i64>, _>("auto_download_updates")
+                .map(|x| x == 1),
+            version: res.get::<i64, _>("version") as usize,
         })
     }
 
@@ -154,7 +167,7 @@ impl Settings {
         let feature_flags = serde_json::to_string(&self.feature_flags)?;
         let version = self.version as i64;
 
-        sqlx::query!(
+        sqlx::query(
             "
             UPDATE settings
             SET
@@ -162,79 +175,84 @@ impl Settings {
                 max_concurrent_downloads = $2,
 
                 theme = $3,
-                locale = $4,
-                default_page = $5,
-                collapsed_navigation = $6,
-                advanced_rendering = $7,
-                native_decorations = $8,
+                accent_color = $4,
+                locale = $5,
+                default_page = $6,
+                collapsed_navigation = $7,
+                advanced_rendering = $8,
+                native_decorations = $9,
 
-                discord_rpc = $9,
-                developer_mode = $10,
-                telemetry = $11,
-                personalized_ads = $12,
+                discord_rpc = $10,
+                developer_mode = $11,
+                telemetry = $12,
+                personalized_ads = $13,
 
-                onboarded = $13,
+                onboarded = $14,
 
-                extra_launch_args = jsonb($14),
-                custom_env_vars = jsonb($15),
-                mc_memory_max = $16,
-                mc_force_fullscreen = $17,
-                mc_game_resolution_x = $18,
-                mc_game_resolution_y = $19,
-                hide_on_process_start = $20,
+                extra_launch_args = jsonb($15),
+                custom_env_vars = jsonb($16),
+                mc_memory_max = $17,
+                mc_force_fullscreen = $18,
+                mc_game_resolution_x = $19,
+                mc_game_resolution_y = $20,
+                hide_on_process_start = $21,
 
-                hook_pre_launch = $21,
-                hook_wrapper = $22,
-                hook_post_exit = $23,
+                hook_pre_launch = $22,
+                hook_wrapper = $23,
+                hook_post_exit = $24,
 
-                custom_dir = $24,
-                prev_custom_dir = $25,
-                migrated = $26,
+                custom_dir = $25,
+                prev_custom_dir = $26,
+                migrated = $27,
 
-                toggle_sidebar = $27,
-                feature_flags = $28,
-                hide_nametag_skins_page = $29,
+                toggle_sidebar = $28,
+                feature_flags = $29,
+                hide_nametag_skins_page = $30,
 
-                skipped_update = $30,
-                pending_update_toast_for_version = $31,
-                auto_download_updates = $32,
+                skipped_update = $31,
+                pending_update_toast_for_version = $32,
+                auto_download_updates = $33,
 
-                version = $33
+                version = $34
             ",
-            max_concurrent_writes,
-            max_concurrent_downloads,
-            theme,
-            self.locale,
-            default_page,
-            self.collapsed_navigation,
-            self.advanced_rendering,
-            self.native_decorations,
-            self.discord_rpc,
-            self.developer_mode,
-            self.telemetry,
-            self.personalized_ads,
-            self.onboarded,
-            extra_launch_args,
-            custom_env_vars,
-            self.memory.maximum,
-            self.force_fullscreen,
-            self.game_resolution.0,
-            self.game_resolution.1,
-            self.hide_on_process_start,
-            self.hooks.pre_launch,
-            self.hooks.wrapper,
-            self.hooks.post_exit,
-            self.custom_dir,
-            self.prev_custom_dir,
-            self.migrated,
-            self.toggle_sidebar,
-            feature_flags,
-            self.hide_nametag_skins_page,
-            self.skipped_update,
-            self.pending_update_toast_for_version,
-            self.auto_download_updates,
-            version,
         )
+        .bind(max_concurrent_writes)
+        .bind(max_concurrent_downloads)
+        .bind(theme)
+        .bind(&self.accent_color)
+        .bind(&self.locale)
+        .bind(default_page)
+        .bind(self.collapsed_navigation)
+        .bind(self.advanced_rendering)
+        .bind(self.native_decorations)
+        .bind(self.discord_rpc)
+        .bind(self.developer_mode)
+        .bind(self.telemetry)
+        .bind(self.personalized_ads)
+        .bind(self.onboarded)
+        .bind(extra_launch_args)
+        .bind(custom_env_vars)
+        .bind(self.memory.maximum)
+        .bind(self.force_fullscreen)
+        .bind(self.game_resolution.0)
+        .bind(self.game_resolution.1)
+        .bind(self.hide_on_process_start)
+        .bind(&self.hooks.pre_launch)
+        .bind(&self.hooks.wrapper)
+        .bind(&self.hooks.post_exit)
+        .bind(&self.custom_dir)
+        .bind(&self.prev_custom_dir)
+        .bind(self.migrated)
+        .bind(self.toggle_sidebar)
+        .bind(feature_flags)
+        .bind(self.hide_nametag_skins_page)
+        .bind(&self.skipped_update)
+        .bind(&self.pending_update_toast_for_version)
+        .bind(
+            self.auto_download_updates
+                .map(|value| if value { 1 } else { 0 }),
+        )
+        .bind(version)
         .execute(exec)
         .await?;
 

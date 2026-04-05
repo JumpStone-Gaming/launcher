@@ -1,0 +1,176 @@
+2026-04-04T16:27:51.9267596Z Current runner version: '2.333.1'
+2026-04-04T16:27:51.9291593Z ##[group]Runner Image Provisioner
+2026-04-04T16:27:51.9292432Z Hosted Compute Agent
+2026-04-04T16:27:51.9292936Z Version: 20260213.493
+2026-04-04T16:27:51.9293589Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+2026-04-04T16:27:51.9294273Z Build Date: 2026-02-13T00:28:41Z
+2026-04-04T16:27:51.9294952Z Worker ID: {27331d6a-69c4-465b-aecb-2f2b3adb2632}
+2026-04-04T16:27:51.9295671Z Azure Region: westus3
+2026-04-04T16:27:51.9296295Z ##[endgroup]
+2026-04-04T16:27:51.9297718Z ##[group]Operating System
+2026-04-04T16:27:51.9298362Z Ubuntu
+2026-04-04T16:27:51.9298883Z 24.04.4
+2026-04-04T16:27:51.9299329Z LTS
+2026-04-04T16:27:51.9299844Z ##[endgroup]
+2026-04-04T16:27:51.9300391Z ##[group]Runner Image
+2026-04-04T16:27:51.9301189Z Image: ubuntu-24.04
+2026-04-04T16:27:51.9301687Z Version: 20260329.72.1
+2026-04-04T16:27:51.9303018Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260329.72/images/ubuntu/Ubuntu2404-Readme.md
+2026-04-04T16:27:51.9304519Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260329.72
+2026-04-04T16:27:51.9305486Z ##[endgroup]
+2026-04-04T16:27:51.9306554Z ##[group]GITHUB_TOKEN Permissions
+2026-04-04T16:27:51.9308365Z Contents: read
+2026-04-04T16:27:51.9308948Z Metadata: read
+2026-04-04T16:27:51.9309465Z Packages: read
+2026-04-04T16:27:51.9310093Z ##[endgroup]
+2026-04-04T16:27:51.9312271Z Secret source: Actions
+2026-04-04T16:27:51.9312908Z Prepare workflow directory
+2026-04-04T16:27:51.9686677Z Prepare all required actions
+2026-04-04T16:27:51.9724157Z Getting action download info
+2026-04-04T16:27:52.3899175Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-04-04T16:27:52.5457556Z Download action repository 'dawidd6/action-download-artifact@v3' (SHA:09f2f74827fd3a8607589e5ad7f9398816f540fe)
+2026-04-04T16:27:55.9467577Z Complete job name: Release JS Gaming App
+2026-04-04T16:27:56.0195937Z ##[group]Run actions/checkout@v4
+2026-04-04T16:27:56.0196584Z with:
+2026-04-04T16:27:56.0196846Z   repository: JumpStone-Gaming/launcher
+2026-04-04T16:27:56.0197296Z   token: ***
+2026-04-04T16:27:56.0197516Z   ssh-strict: true
+2026-04-04T16:27:56.0197741Z   ssh-user: git
+2026-04-04T16:27:56.0197972Z   persist-credentials: true
+2026-04-04T16:27:56.0198227Z   clean: true
+2026-04-04T16:27:56.0198463Z   sparse-checkout-cone-mode: true
+2026-04-04T16:27:56.0198739Z   fetch-depth: 1
+2026-04-04T16:27:56.0198962Z   fetch-tags: false
+2026-04-04T16:27:56.0199184Z   show-progress: true
+2026-04-04T16:27:56.0199416Z   lfs: false
+2026-04-04T16:27:56.0199633Z   submodules: false
+2026-04-04T16:27:56.0199873Z   set-safe-directory: true
+2026-04-04T16:27:56.0200326Z ##[endgroup]
+2026-04-04T16:27:56.1245767Z Syncing repository: JumpStone-Gaming/launcher
+2026-04-04T16:27:56.1247124Z ##[group]Getting Git version info
+2026-04-04T16:27:56.1247647Z Working directory is '/home/runner/work/launcher/launcher'
+2026-04-04T16:27:56.1248234Z [command]/usr/bin/git version
+2026-04-04T16:27:56.1293876Z git version 2.53.0
+2026-04-04T16:27:56.1319571Z ##[endgroup]
+2026-04-04T16:27:56.1335018Z Temporarily overriding HOME='/home/runner/work/_temp/cf492818-f138-4739-b41b-9337779154c4' before making global git config changes
+2026-04-04T16:27:56.1336481Z Adding repository directory to the temporary git global config as a safe directory
+2026-04-04T16:27:56.1341502Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/launcher/launcher
+2026-04-04T16:27:56.1371472Z Deleting the contents of '/home/runner/work/launcher/launcher'
+2026-04-04T16:27:56.1374966Z ##[group]Initializing the repository
+2026-04-04T16:27:56.1378987Z [command]/usr/bin/git init /home/runner/work/launcher/launcher
+2026-04-04T16:27:56.1476263Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-04-04T16:27:56.1478630Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-04-04T16:27:56.1479252Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-04-04T16:27:56.1479917Z hint: call:
+2026-04-04T16:27:56.1480126Z hint:
+2026-04-04T16:27:56.1480559Z hint: 	git config --global init.defaultBranch <name>
+2026-04-04T16:27:56.1482135Z hint:
+2026-04-04T16:27:56.1482484Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-04-04T16:27:56.1483020Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-04-04T16:27:56.1483486Z hint:
+2026-04-04T16:27:56.1483876Z hint: 	git branch -m <name>
+2026-04-04T16:27:56.1484202Z hint:
+2026-04-04T16:27:56.1484542Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-04-04T16:27:56.1485125Z Initialized empty Git repository in /home/runner/work/launcher/launcher/.git/
+2026-04-04T16:27:56.1489929Z [command]/usr/bin/git remote add origin https://github.com/JumpStone-Gaming/launcher
+2026-04-04T16:27:56.1518896Z ##[endgroup]
+2026-04-04T16:27:56.1519511Z ##[group]Disabling automatic garbage collection
+2026-04-04T16:27:56.1523519Z [command]/usr/bin/git config --local gc.auto 0
+2026-04-04T16:27:56.1550338Z ##[endgroup]
+2026-04-04T16:27:56.1551065Z ##[group]Setting up auth
+2026-04-04T16:27:56.1557272Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-04-04T16:27:56.1585585Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-04-04T16:27:56.1866572Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-04-04T16:27:56.1893924Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-04-04T16:27:56.2101189Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-04-04T16:27:56.2136648Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-04-04T16:27:56.2350558Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-04-04T16:27:56.2382098Z ##[endgroup]
+2026-04-04T16:27:56.2382844Z ##[group]Fetching the repository
+2026-04-04T16:27:56.2390201Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2920dedd0da78c0c1c8f88544159978c97c46603:refs/remotes/origin/main
+2026-04-04T16:27:58.7630101Z From https://github.com/JumpStone-Gaming/launcher
+2026-04-04T16:27:58.7631255Z  * [new ref]         2920dedd0da78c0c1c8f88544159978c97c46603 -> origin/main
+2026-04-04T16:27:58.7661223Z ##[endgroup]
+2026-04-04T16:27:58.7662103Z ##[group]Determining the checkout info
+2026-04-04T16:27:58.7663978Z ##[endgroup]
+2026-04-04T16:27:58.7668900Z [command]/usr/bin/git sparse-checkout disable
+2026-04-04T16:27:58.7706168Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-04-04T16:27:58.7732512Z ##[group]Checking out the ref
+2026-04-04T16:27:58.7737169Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-04-04T16:27:59.1515182Z Switched to a new branch 'main'
+2026-04-04T16:27:59.1516284Z branch 'main' set up to track 'origin/main'.
+2026-04-04T16:27:59.1551259Z ##[endgroup]
+2026-04-04T16:27:59.1591178Z [command]/usr/bin/git log -1 --format=%H
+2026-04-04T16:27:59.1613602Z 2920dedd0da78c0c1c8f88544159978c97c46603
+2026-04-04T16:27:59.1847063Z ##[group]Run dawidd6/action-download-artifact@v3
+2026-04-04T16:27:59.1847408Z with:
+2026-04-04T16:27:59.1847593Z   workflow: theseus-build.yml
+2026-04-04T16:27:59.1847819Z   run_id: 23982438215
+2026-04-04T16:27:59.1848038Z   name: App bundle (x86_64-pc-windows-msvc)
+2026-04-04T16:27:59.1848305Z   path: windows-build
+2026-04-04T16:27:59.1848650Z   github_token: ***
+2026-04-04T16:27:59.1848853Z   workflow_search: false
+2026-04-04T16:27:59.1849075Z   workflow_conclusion: success
+2026-04-04T16:27:59.1849511Z   repo: JumpStone-Gaming/launcher
+2026-04-04T16:27:59.1849760Z   name_is_regexp: false
+2026-04-04T16:27:59.1850004Z   allow_forks: true
+2026-04-04T16:27:59.1850348Z   check_artifacts: false
+2026-04-04T16:27:59.1850657Z   search_artifacts: false
+2026-04-04T16:27:59.1851061Z   skip_unpack: false
+2026-04-04T16:27:59.1851286Z   if_no_artifact_found: fail
+2026-04-04T16:27:59.1851522Z ##[endgroup]
+2026-04-04T16:27:59.4527142Z ==> Repository: JumpStone-Gaming/launcher
+2026-04-04T16:27:59.4528233Z ==> Artifact name: App bundle (x86_64-pc-windows-msvc)
+2026-04-04T16:27:59.4528922Z ==> Local path: windows-build
+2026-04-04T16:27:59.4529343Z ==> Workflow name: theseus-build.yml
+2026-04-04T16:27:59.4529699Z ==> Workflow conclusion: success
+2026-04-04T16:27:59.4529992Z ==> Allow forks: true
+2026-04-04T16:27:59.7429794Z ==> Artifact: 6271833895
+2026-04-04T16:27:59.7433413Z ==> Downloading: App bundle (x86_64-pc-windows-msvc).zip (26.67 MB)
+2026-04-04T16:28:01.9872588Z ##[group]==> Extracting: App bundle (x86_64-pc-windows-msvc).zip
+2026-04-04T16:28:01.9873640Z   inflating: windows-build/nsis/JS Gaming App_0.1.0_x64-setup.exe
+2026-04-04T16:28:01.9875712Z   inflating: windows-build/msi/JS Gaming App_0.1.0_x64_en-US.msi
+2026-04-04T16:28:02.0204424Z ##[endgroup]
+2026-04-04T16:28:02.0429586Z ##[group]Run VERSION_TAG="v0.1.0"
+2026-04-04T16:28:02.0429929Z [36;1mVERSION_TAG="v0.1.0"[0m
+2026-04-04T16:28:02.0430176Z [36;1mVERSION="${VERSION_TAG#v}"[0m
+2026-04-04T16:28:02.0430413Z [36;1m[0m
+2026-04-04T16:28:02.0430655Z [36;1m# Signatur aus der generierten .sig Datei auslesen[0m
+2026-04-04T16:28:02.0431549Z [36;1m# Hinweis: Der Dateiname muss exakt so sein, wie Tauri ihn im Build erstellt![0m
+2026-04-04T16:28:02.0431984Z [36;1mSIG=$(cat windows-build/*.zip.sig)[0m
+2026-04-04T16:28:02.0432233Z [36;1m[0m
+2026-04-04T16:28:02.0432404Z [36;1mjq -nc \[0m
+2026-04-04T16:28:02.0432599Z [36;1m  --arg ver "$VERSION" \[0m
+2026-04-04T16:28:02.0432840Z [36;1m  --arg sig "$SIG" \[0m
+2026-04-04T16:28:02.0433448Z [36;1m  --arg url "https://github.com/JumpStone-Gaming/launcher/releases/download/$VERSION_TAG/JS_Gaming_App_${VERSION}_x64-setup.nsis.zip" \[0m
+2026-04-04T16:28:02.0434033Z [36;1m  '{[0m
+2026-04-04T16:28:02.0434212Z [36;1m    "version": $ver,[0m
+2026-04-04T16:28:02.0434492Z [36;1m    "notes": "JumpStone Launcher Update",[0m
+2026-04-04T16:28:02.0434786Z [36;1m    "pub_date": now | todateiso8601,[0m
+2026-04-04T16:28:02.0435057Z [36;1m    "platforms": {[0m
+2026-04-04T16:28:02.0435272Z [36;1m      "windows-x86_64": {[0m
+2026-04-04T16:28:02.0435505Z [36;1m        "signature": $sig,[0m
+2026-04-04T16:28:02.0435730Z [36;1m        "url": $url[0m
+2026-04-04T16:28:02.0435922Z [36;1m      }[0m
+2026-04-04T16:28:02.0436089Z [36;1m    }[0m
+2026-04-04T16:28:02.0436254Z [36;1m  }' > latest.json[0m
+2026-04-04T16:28:02.0465625Z shell: /usr/bin/bash -e {0}
+2026-04-04T16:28:02.0465892Z ##[endgroup]
+2026-04-04T16:28:02.0539727Z cat: 'windows-build/*.zip.sig': No such file or directory
+2026-04-04T16:28:02.0554166Z ##[error]Process completed with exit code 1.
+2026-04-04T16:28:02.0663375Z Post job cleanup.
+2026-04-04T16:28:02.1581601Z [command]/usr/bin/git version
+2026-04-04T16:28:02.1615617Z git version 2.53.0
+2026-04-04T16:28:02.1664479Z Temporarily overriding HOME='/home/runner/work/_temp/9c72437a-d5c9-475b-b948-1def8d6169ea' before making global git config changes
+2026-04-04T16:28:02.1665768Z Adding repository directory to the temporary git global config as a safe directory
+2026-04-04T16:28:02.1670773Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/launcher/launcher
+2026-04-04T16:28:02.1703916Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-04-04T16:28:02.1735265Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-04-04T16:28:02.1961814Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-04-04T16:28:02.1982718Z http.https://github.com/.extraheader
+2026-04-04T16:28:02.1994444Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-04-04T16:28:02.2024026Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-04-04T16:28:02.2239998Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-04-04T16:28:02.2270213Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-04-04T16:28:02.2585691Z Cleaning up orphan processes
+2026-04-04T16:28:02.2866362Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, dawidd6/action-download-artifact@v3. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

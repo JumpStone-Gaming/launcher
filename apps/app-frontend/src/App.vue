@@ -238,6 +238,7 @@ async function setupApp() {
 		locale,
 		collapsed_navigation,
 		advanced_rendering,
+		accent_color,
 		onboarded,
 		default_page,
 		toggle_sidebar,
@@ -265,6 +266,7 @@ async function setupApp() {
 	if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
 
 	themeStore.setThemeState(theme)
+	themeStore.setAccentColor(accent_color)
 	themeStore.collapsedNavigation = collapsed_navigation
 	themeStore.advancedRendering = advanced_rendering
 	themeStore.toggleSidebar = toggle_sidebar
@@ -429,6 +431,7 @@ let systemThemeMediaQuery
 const updateSystemThemePreference = () => {
 	if (systemThemeMediaQuery) {
 		systemPrefersDark.value = systemThemeMediaQuery.matches
+		themeStore.setThemeClass()
 	}
 }
 
@@ -1308,21 +1311,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--color-divider-dark: var(--brand-gradient-border);
 }
 
-.app-sidebar::after {
-	content: '';
-	position: absolute;
-	bottom: 250px;
-	left: 0;
-	right: 0;
-	height: 5rem;
-	background: var(--brand-gradient-fade-out-color);
-	pointer-events: none;
-}
-
-.app-sidebar.has-plus::after {
-	display: none;
-}
-
 .disable-advanced-rendering {
 	.app-sidebar::before {
 		box-shadow: none;
@@ -1342,6 +1330,21 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	width: 2rem;
 	position: absolute;
 	pointer-events: none;
+}
+
+.app-sidebar::after {
+	content: '';
+	position: absolute;
+	bottom: 250px;
+	left: 0;
+	right: 0;
+	height: 5rem;
+	background: var(--brand-gradient-fade-out-color);
+	pointer-events: none;
+}
+
+.app-sidebar.has-plus::after {
+	display: none;
 }
 
 .app-viewport {

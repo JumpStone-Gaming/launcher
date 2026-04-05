@@ -20,6 +20,14 @@ mod updater_impl;
 #[cfg(not(feature = "updater"))]
 mod updater_impl_noop;
 
+fn resolved_app_identifier(base_identifier: &str) -> String {
+    if cfg!(debug_assertions) {
+        format!("{base_identifier}-dev")
+    } else {
+        base_identifier.to_string()
+    }
+}
+
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
 #[tauri::command]
@@ -28,7 +36,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app.clone()).await?;
 
     tracing::info!("Initializing app state...");
-    State::init(app.config().identifier.clone()).await?;
+    State::init(resolved_app_identifier(&app.config().identifier)).await?;
 
     let state = State::get().await?;
     app.asset_protocol_scope()
@@ -112,8 +120,10 @@ fn main() {
     */
 
     let tauri_context = tauri::generate_context!();
+    let app_identifier =
+        resolved_app_identifier(&tauri_context.config().identifier);
 
-    let _log_guard = theseus::start_logger(&tauri_context.config().identifier);
+    let _log_guard = theseus::start_logger(&app_identifier);
 
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
