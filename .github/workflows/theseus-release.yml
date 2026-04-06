@@ -57,29 +57,29 @@ jobs:
           VERSION="${VERSION_TAG#v}"
           echo "📦 Version: $VERSION (Tag: $VERSION_TAG)"
 
-          SIG_FILE="$(find windows-build -type f -name '*.zip.sig' -print -quit)"
+          SIG_FILE="$(find windows-build -type f \( -name '*.exe.sig' -o -name '*.msi.sig' \) -print -quit)"
 
           if [ -z "$SIG_FILE" ]; then
-            echo "❌ FEHLER: Keine .zip.sig Datei gefunden!"
+            echo "❌ FEHLER: Keine .exe.sig oder .msi.sig Datei gefunden!"
             echo "Inhalt von windows-build:"
             find windows-build -type f
             exit 1
           fi
 
-          ZIP_FILE="${SIG_FILE%.sig}"
+          INSTALLER_FILE="${SIG_FILE%.sig}"
 
-          if [ ! -f "$ZIP_FILE" ]; then
-            echo "❌ FEHLER: ZIP-Datei nicht gefunden: $ZIP_FILE"
+          if [ ! -f "$INSTALLER_FILE" ]; then
+            echo "❌ FEHLER: Installer-Datei nicht gefunden: $INSTALLER_FILE"
             exit 1
           fi
 
           SIG="$(cat "$SIG_FILE")"
-          ZIP_NAME="$(basename "$ZIP_FILE")"
+          INSTALLER_NAME="$(basename "$INSTALLER_FILE")"
 
           jq -nc \
             --arg ver "$VERSION" \
             --arg sig "$SIG" \
-            --arg url "https://github.com/${{ github.repository }}/releases/download/$VERSION_TAG/$ZIP_NAME" \
+            --arg url "https://github.com/${{ github.repository }}/releases/download/$VERSION_TAG/$INSTALLER_NAME" \
             '{
               "version": $ver,
               "notes": "JumpStone Launcher Update",
