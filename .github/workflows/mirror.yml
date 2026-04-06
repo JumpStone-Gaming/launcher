@@ -1,0 +1,86 @@
+name: Mirror to Codeberg
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  create:
+  delete:
+  release:
+    types: [published, edited, prereleased, released, unpublished, deleted]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mirror_git_refs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mirror all git refs to Codeberg
+        env:
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --mirror "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" repo.git
+          cd repo.git
+          git remote set-url --push origin "https://JumpStone:${CODEBERG_TOKEN}@codeberg.org/JumpStone-Gaming/app.git"
+          git push --mirror origin
+
+  sync_releases:
+    runs-on: ubuntu-latest
+    needs: mirror_git_refs
+    steps:
+      - name: Sync releases to Codeberg
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          CODEBERG_OWNER: JumpStone-Gaming
+          CODEBERG_REPO: app
+        run: |
+          set -euo pipefail
+
+          GH_API="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=100"
+          CB_API="https://codeberg.org/api/v1/repos/${CODEBERG_OWNER}/${CODEBERG_REPO}/releases"
+
+          gh_releases="$(curl -fsSL \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "${GH_API}")"
+
+          cb_releases="$(curl -fsSL \
+            -H "Authorization: token ${CODEBERG_TOKEN}" \
+            "${CB_API}")"
+
+          echo "${gh_releases}" | jq -c '.[] | {tag_name, name, body, draft, prerelease, target_commitish}' | while IFS= read -r rel; do
+            tag="$(echo "${rel}" | jq -r '.tag_name')"
+            cb_id="$(echo "${cb_releases}" | jq -r --arg tag "${tag}" 'first(.[] | select(.tag_name == $tag) | .id) // ""')"
+            payload="$(echo "${rel}" | jq '{tag_name, name, body, draft, prerelease, target_commitish}')"
+
+            if [ -n "${cb_id}" ]; then
+              curl -fsSL -X PATCH \
+                -H "Authorization: token ${CODEBERG_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "${payload}" \
+                "${CB_API}/${cb_id}" > /dev/null
+            else
+              curl -fsSL -X POST \
+                -H "Authorization: token ${CODEBERG_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "${payload}" \
+                "${CB_API}" > /dev/null
+            fi
+          done
+
+          echo "${cb_releases}" | jq -c '.[] | {id, tag_name}' | while IFS= read -r cb_rel; do
+            cb_id="$(echo "${cb_rel}" | jq -r '.id')"
+            tag="$(echo "${cb_rel}" | jq -r '.tag_name')"
+            exists_on_github="$(echo "${gh_releases}" | jq --arg tag "${tag}" 'any(.[]; .tag_name == $tag)')"
+
+            if [ "${exists_on_github}" != "true" ]; then
+              curl -fsSL -X DELETE \
+                -H "Authorization: token ${CODEBERG_TOKEN}" \
+                "${CB_API}/${cb_id}" > /dev/null
+            fi
+          done
